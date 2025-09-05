@@ -1,0 +1,6 @@
+@Kutiyana_Memon_Hospital_Api_HostAddress = http://localhost:5172
+
+GET {{Kutiyana_Memon_Hospital_Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
