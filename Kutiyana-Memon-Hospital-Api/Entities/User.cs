@@ -8,6 +8,7 @@
         public string? Email { get; set; }      
         public string? Phone { get; set; }       
         public string? PasswordHash { get; set; }
+        public string? PasswordSalt { get; set; }
         public string? ImageUrl { get; set; }
         public int CompanyId { get; set; }
         public Company? company { get; set; }
@@ -17,6 +18,8 @@
         public string? Designation { get; set; }
         public string? Address { get; set; }
         public DateTime? JoiningDate { get; set; }
+        public string? ResetPasswordToken { get; set; }
+        public DateTime? ResetTokenExpiry { get; set; }
         public bool IsActive { get; set; } = true; 
         public string FullName
         {

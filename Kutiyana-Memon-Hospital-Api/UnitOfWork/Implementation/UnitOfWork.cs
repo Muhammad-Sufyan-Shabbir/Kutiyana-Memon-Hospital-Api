@@ -40,6 +40,15 @@ namespace Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Implementation
         public IGenericRepository<RoleModuleAccess> roleModuleAccessRepository =>
             _roleModuleAccess ??= new GenericRepository<RoleModuleAccess>(_context);
 
+
+        private IUserRepository _user;
+        public IUserRepository userRepository =>
+            _user ??= new UserRepository(_context, _mapper);
+
+        private IAuthRepository _authRepository;
+        public IAuthRepository authRepository =>
+            _authRepository ??= new AuthRepository(_context, _mapper);
+
         public async Task<int> SaveChangesAsync() =>
             await _context.SaveChangesAsync();
 

@@ -2,15 +2,14 @@
 using Kutiyana_Memon_Hospital_Api.API.Data;
 using Kutiyana_Memon_Hospital_Api.API.Extensions;
 using Kutiyana_Memon_Hospital_Api.API.MiddleWare;
+using Kutiyana_Memon_Hospital_Api.API.Services.Implementation;
+using Kutiyana_Memon_Hospital_Api.API.Services.Interfaces;
 using Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Implementation;
 using Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Interfaces;
 using Kutiyana_Memon_Hospital_Api.Repositories.Implementation;
 using Kutiyana_Memon_Hospital_Api.Repositories.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +35,10 @@ builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =
 builder.Services.RegisterServices();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IFunctionRepository, FunctionRepository>();
+
+// ✅ Register EmailService for DI
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 // JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -89,7 +92,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
- 
+
 app.UseCors("AllowAngularApp");
 
 app.UseMiddleware<ExceptionMiddleware>();

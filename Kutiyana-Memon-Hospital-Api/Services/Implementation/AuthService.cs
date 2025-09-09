@@ -1,43 +1,87 @@
-﻿using BCrypt.Net;
+﻿using Kutiyana_Memon_Hospital_Api.API.Data;
+using Kutiyana_Memon_Hospital_Api.API.Entities;
 using Kutiyana_Memon_Hospital_Api.API.Helpers;
 using Kutiyana_Memon_Hospital_Api.API.Services.Interfaces;
 using Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Interfaces;
 using Kutiyana_Memon_Hospital_Api.DTOs.Request;
 using Kutiyana_Memon_Hospital_Api.DTOs.Response;
+using Kutiyana_Memon_Hospital_Api.Helpers;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Kutiyana_Memon_Hospital_Api.API.Services.Implementation
 {
     public class AuthService : IAuthService
     {
-        private readonly IUnitOfWork _uow;
-        private readonly IConfiguration _config;
+        private readonly ApplicationDbContext _context;
+        private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public AuthService(IUnitOfWork uow, IConfiguration config)
+        public AuthService(ApplicationDbContext context, IJwtService jwtService, IPasswordHasher<User> passwordHasher,IEmailService emailService)
         {
-            _uow = uow;
-            _config = config;
+            _context = context;
+            _jwtService = jwtService;
+            _passwordHasher = passwordHasher;
+            _emailService = emailService;
         }
 
-        public async Task<AuthResponseDto> LoginAsync(AuthRequestDto dto)
+        public async Task<string?> LoginAsync(AuthRequestDto request)
         {
-            var user = await _uow.Users.GetByEmailOrUserNameAsync(dto.Identifier);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-                throw new UnauthorizedAccessException("Invalid credentials");
+            // 1. User find karo (email ya username se)
+            var user = await _context.ApplicationUser
+                .Include(u => u.Role)
+                .Include(u => u.company)
+                .FirstOrDefaultAsync(u => u.Email == request.EmailOrUsername || u.UserName == request.EmailOrUsername);
 
-            var role = (await _uow.Roles.GetByIdAsync(user.RoleId))?.Name ?? "User";
+            if (user == null) return null;
 
-            var token = JwtHelper.GenerateToken(user, _config["Jwt:Key"], _config["Jwt:Issuer"]);
+            // 2. Verify password with helper
+            bool isPasswordValid = PasswordHelper.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt);
+            if (!isPasswordValid) return null;
+             
+            var moduleAccesses = await _context.roleModuleAccess
+                .Where(rm => rm.RoleId == user.RoleId)
+                .Include(rm => rm.Module)
+                .ToListAsync(); 
 
-            return new AuthResponseDto
-            {
+            var token = _jwtService.GenerateToken(user, user.Role!, moduleAccesses);
+             
+            return token;
+        }
+        public async Task ForgotPasswordAsync(string email)
+        {
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) throw new Exception("User not found");
 
-                Token = token,
-                ImageUrl = user.ImageUrl,
-                FullName = user.FullName,
-                Role = role,
-                Label = user.Label,
-                ExpiresAt = DateTime.UtcNow.AddHours(24)
-            };
+            // Generate token & expiry
+            user.ResetPasswordToken = Guid.NewGuid().ToString();
+            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
+            await _context.SaveChangesAsync();
+
+            // Create reset link
+            string resetLink = $"http://localhost:4200/auth/forgot-password?token={user.ResetPasswordToken}&email={user.Email}";
+
+            // Send email
+            await _emailService.SendResetPasswordEmailAsync("sufyankmh@gmail.com", resetLink);
+        }
+        public async Task ResetPasswordAsync(string email, string token, string newPassword)
+        {
+            var user = await _context.ApplicationUser
+                .FirstOrDefaultAsync(u => u.Email == email && u.ResetPasswordToken == token);
+
+            if (user == null || user.ResetTokenExpiry < DateTime.UtcNow)
+                throw new Exception("Invalid or expired token");
+             
+            var (hash, salt) = PasswordHelper.HashPassword(newPassword);
+
+            user.PasswordHash = hash;
+            user.PasswordSalt = salt;   
+            user.ResetPasswordToken = null;
+            user.ResetTokenExpiry = null;
+
+            await _context.SaveChangesAsync();
         }
     }
 }

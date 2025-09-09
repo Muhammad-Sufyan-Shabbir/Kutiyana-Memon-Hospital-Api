@@ -5,6 +5,8 @@ namespace Kutiyana_Memon_Hospital_Api.API.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<AuthResponseDto> LoginAsync( AuthRequestDto dto);
+        Task<string?> LoginAsync(AuthRequestDto request);
+        Task ForgotPasswordAsync(string email);
+        Task ResetPasswordAsync(string email, string token, string newPassword);
     }
 }

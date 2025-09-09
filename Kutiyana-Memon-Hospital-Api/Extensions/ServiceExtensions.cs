@@ -1,18 +1,23 @@
-﻿using Kutiyana_Memon_Hospital_Api.API.Services.GetCurrentUser;
+﻿using Kutiyana_Memon_Hospital_Api.API.Entities;
+using Kutiyana_Memon_Hospital_Api.API.Services.GetCurrentUser;
 using Kutiyana_Memon_Hospital_Api.API.Services.Implementation;
 using Kutiyana_Memon_Hospital_Api.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens; 
 using System.Text;
 
 namespace Kutiyana_Memon_Hospital_Api.API.Extensions
 {
     public static class ServiceExtensions
+
+
     {
         public static void AddJwtAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            var key = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
-            var issuer = config["Jwt:Issuer"];
+            var key = Encoding.UTF8.GetBytes(config["JwtSettings:SecretKey"]);
+            var issuer = config["JwtSettings:Issuer"];
+            var audience = config["JwtSettings:Audience"];
 
             services.AddAuthentication(x =>
             {
@@ -26,14 +31,16 @@ namespace Kutiyana_Memon_Hospital_Api.API.Extensions
                 {
                     ValidateIssuer = true,
                     ValidIssuer = issuer,
-                    ValidateAudience = false,
+                    ValidateAudience = true,
+                    ValidAudience = audience,
                     ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuerSigningKey = true
                 };
             });
-
         }
+
+
 
 
         public static void RegisterServices(this IServiceCollection services)
@@ -43,6 +50,9 @@ namespace Kutiyana_Memon_Hospital_Api.API.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IUserContextService, UserContextService>();
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddHttpContextAccessor();
         }
 

@@ -2,13 +2,14 @@
 {
     public class AuthResponseDto
     {
-        public string Token { get; set; }
-        public int UserId { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string ImageUrl { get; set; }
-        public string Role { get; set; }
-        public string Label { get; set; }
-        public DateTime ExpiresAt { get; set; }
+        public string? Token { get; set; }          
+        public string? Email { get; set; }      
+        public string? UserName { get; set; }         
+        public string? FullName { get; set; }       
+        public int RoleId { get; set; }               
+        public string? RoleName { get; set; }     
+        public int CompanyId { get; set; }           
+        public string? CompanyName { get; set; }     
+        public List<string>? Permissions { get; set; }  
     }
 }

@@ -10,7 +10,6 @@ namespace Kutiyana_Memon_Hospital_Api.DTOs.Response
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? PasswordHash { get; set; }
-        public string? ImageUrl { get; set; }
         public int CompanyId { get; set; }
         public Company? company { get; set; }
         public int RoleId { get; set; }
