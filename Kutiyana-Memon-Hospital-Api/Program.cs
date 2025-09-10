@@ -1,5 +1,6 @@
 ﻿using Kutiyana_Memon_Hospital_Api.API.AutoMapper;
 using Kutiyana_Memon_Hospital_Api.API.Data;
+using Kutiyana_Memon_Hospital_Api.API.Entities;
 using Kutiyana_Memon_Hospital_Api.API.Extensions;
 using Kutiyana_Memon_Hospital_Api.API.MiddleWare;
 using Kutiyana_Memon_Hospital_Api.API.Services.Implementation;
@@ -8,6 +9,7 @@ using Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Implementation;
 using Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Interfaces;
 using Kutiyana_Memon_Hospital_Api.Repositories.Implementation;
 using Kutiyana_Memon_Hospital_Api.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -30,7 +32,7 @@ builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =
     var connectionString = config.GetConnectionString("DefaultConnection");
     options.UseSqlServer(connectionString);
 });
-
+ 
 // Register custom services + UnitOfWork
 builder.Services.RegisterServices();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

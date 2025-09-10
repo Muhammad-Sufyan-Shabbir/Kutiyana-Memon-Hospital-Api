@@ -12,9 +12,11 @@ namespace Kutiyana_Memon_Hospital_Api.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _auth;
-        public AuthController(IAuthService auth)
+        private readonly IEmailService _emailService;
+        public AuthController(IAuthService auth, IEmailService emailService )
         {
             _auth = auth;
+            _emailService = emailService;
         }
 
         [HttpPost("login")]
@@ -53,6 +55,13 @@ namespace Kutiyana_Memon_Hospital_Api.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [HttpPost("send")]
+        public async Task<IActionResult> SendEmail([FromBody] EmailRequest request)
+        {
+            await _emailService.SendEmailAsync(request);
+            return Ok(new { Message = "Email sent successfully!" });
         }
     }
 }

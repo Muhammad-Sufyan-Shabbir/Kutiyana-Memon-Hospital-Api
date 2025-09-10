@@ -17,4 +17,11 @@
         public string Token { get; set; } = string.Empty;
         public string NewPassword { get; set; } = string.Empty;
     }
+
+    public class EmailRequest
+    {
+        public string ToEmail { get; set; }
+        public string Subject { get; set; }
+        public string Body { get; set; }
+    }
 }

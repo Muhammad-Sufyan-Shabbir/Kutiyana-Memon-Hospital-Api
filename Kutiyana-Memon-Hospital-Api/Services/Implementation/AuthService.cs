@@ -61,11 +61,12 @@ namespace Kutiyana_Memon_Hospital_Api.API.Services.Implementation
             await _context.SaveChangesAsync();
 
             // Create reset link
-            string resetLink = $"http://localhost:4200/auth/forgot-password?token={user.ResetPasswordToken}&email={user.Email}";
+            string resetLink = $"http://localhost:4200/auth/reset-password?token={user.ResetPasswordToken}&email={user.Email}";
 
             // Send email
-            await _emailService.SendResetPasswordEmailAsync("sufyankmh@gmail.com", resetLink);
+            await _emailService.SendPasswordResetEmail(user.Email, resetLink); // Use actual user email
         }
+         
         public async Task ResetPasswordAsync(string email, string token, string newPassword)
         {
             var user = await _context.ApplicationUser
