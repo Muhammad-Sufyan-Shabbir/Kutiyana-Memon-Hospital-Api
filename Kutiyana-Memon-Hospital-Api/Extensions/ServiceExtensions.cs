@@ -52,6 +52,7 @@ namespace Kutiyana_Memon_Hospital_Api.API.Extensions
             services.AddScoped<IUserContextService, UserContextService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IMenuService, MenuService>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddHttpContextAccessor();
         }

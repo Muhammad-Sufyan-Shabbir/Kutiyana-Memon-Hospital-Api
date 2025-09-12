@@ -32,6 +32,17 @@ namespace Kutiyana_Memon_Hospital_Api.API.AutoMapper
             // Company
             CreateMap<CompanyRequest, Company>();
             CreateMap<Company, CompanyResponse>();
+
+            // ✅ Module Mapping
+            CreateMap<MenuRequest, Module>();
+            CreateMap<Module, MenuResponse>()
+                .ForMember(dest => dest.ParentName, opt => opt.MapFrom(src => src.Parent != null ? src.Parent.Name : null))
+                .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.Children))
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src =>
+                    src.RoleModuleAccesses != null
+                        ? src.RoleModuleAccesses.Select(r => r.Role.Name).ToList()
+                        : new List<string>()
+                ));
         }
     }
 }

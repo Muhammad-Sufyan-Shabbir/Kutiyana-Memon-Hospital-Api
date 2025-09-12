@@ -49,6 +49,10 @@ namespace Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Implementation
         public IAuthRepository authRepository =>
             _authRepository ??= new AuthRepository(_context, _mapper);
 
+        private IMenuRepository _menuRepository;
+        public IMenuRepository menuRepository =>
+            _menuRepository ??= new MenuRepository(_context, _mapper);
+
         public async Task<int> SaveChangesAsync() =>
             await _context.SaveChangesAsync();
 

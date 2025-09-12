@@ -15,6 +15,7 @@ namespace Kutiyana_Memon_Hospital_Api.API.UnitOfWork.Interfaces
         IGenericRepository<RoleModuleAccess> roleModuleAccessRepository { get; }
         IUserRepository userRepository { get; }
         IAuthRepository authRepository { get; }
+        IMenuRepository menuRepository { get; }
         Task<int> SaveChangesAsync();
     }
 }
